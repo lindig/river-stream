@@ -4,6 +4,15 @@
 
 (generate_opam_files true)
 
+(source
+ (github lindig/river-stream))
+
+(license Unlicense)
+
+(authors "Christian Lindig <lindig@gmail.com>")
+
+(maintainers "Christian Lindig <lindig@gmail.com>")
+
 (package
  (name river-stream)
  (synopsis "Estimate the stream of a river from rowing FIT files")
