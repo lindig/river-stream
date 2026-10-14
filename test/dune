@@ -1,0 +1,5 @@
+(test
+ (name test_river_stream)
+ (libraries river_stream yojson)
+ (deps
+  (glob_files data/*.fit)))
