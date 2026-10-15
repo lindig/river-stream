@@ -1,3 +1,5 @@
+![Build](https://github.com/lindig/river-stream/workflows/CI/badge.svg)
+
 # river-stream
 
 Estimate the stream (current) of a river from rowing FIT files. Each file is
