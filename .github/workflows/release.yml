@@ -1,0 +1,58 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: # enables manual runs from the Actions UI
+
+permissions:
+  contents: write # needed to create the GitHub Release
+
+jobs:
+  build:
+    name: Build native binary (Linux x86-64)
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Source ────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. OCaml toolchain ───────────────────────────────────────────────
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.3
+          cache-prefix: v1
+
+      # ── 3. Dependencies ──────────────────────────────────────────────────
+      - name: Install opam dependencies
+        run: opam install . --deps-only --with-test -y
+
+      # ── 4. Build ─────────────────────────────────────────────────────────
+      - name: Build release binary
+        run: |
+          opam exec -- dune build --profile release
+          cp _build/default/bin/main.exe river-stream
+
+      # ── 5. Package ───────────────────────────────────────────────────────
+      - name: Create release archive
+        run: |
+          tar -czf vmax-${{ github.ref_name }}-linux-x86_64.tar.gz \
+            river-stream \
+            README.md
+
+      # ── 6. Release ───────────────────────────────────────────────────────
+      # Skipped on manual runs from an untagged commit; all earlier steps
+      # (compile, strip, package) still run and are visible in the Actions log.
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Release ${{ github.ref_name }}"
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') && startsWith(github.ref_name, 'v') }}
+          generate_release_notes: true
+          files: |
+            vmax-${{ github.ref_name }}-linux-x86_64.tar.gz

@@ -1,0 +1,28 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system:
+          - ubuntu-latest
+          # - ubuntu-latest-arm
+        ocaml-compiler:
+          - 5.3.0
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Use OCaml  ${{ matrix.ocaml-compiler }}
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+      - run: opam install . --deps-only --with-test
+      - run: opam exec -- dune build
+      - run: opam exec -- dune runtest

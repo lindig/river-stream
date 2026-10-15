@@ -33,3 +33,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/lindig/river-stream.git"
+pin-depends: [
+  ["fit.~dev" "git+https://github.com/lindig/fit.git#main"]
+]
